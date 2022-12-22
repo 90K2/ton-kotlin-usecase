@@ -32,7 +32,7 @@ ton:
 
 ### Use cases
 
-LiteClient `org.ton.tonkotlinusecase.LiteClientTests`
+[LiteClient](src/test/kotlin/org/ton/tonkotlinusecase/LiteClientTests.kt) `org.ton.tonkotlinusecase.LiteClientTests`
 
 Accounts: 
 
@@ -45,13 +45,13 @@ Blocks:
 - decode coin transfer with comment
 - decode notification about NFT receiving
 
-Contract get methods examples `org.ton.tonkotlinusecase.GetMethodsTest`
+[Contract get methods examples](src/test/kotlin/org/ton/tonkotlinusecase/GetMethodsTest.kt) `org.ton.tonkotlinusecase.GetMethodsTest`
 
 - get nft data 
 - get collectable nft address by index
 - get collection data
 
-Wallet `org.ton.tonkotlinusecase.WalletTests`
+[Wallet](src/test/kotlin/org/ton/tonkotlinusecase/WalletTests.kt) `org.ton.tonkotlinusecase.WalletTests`
 
 - get wallet seqno
 - send TONs
