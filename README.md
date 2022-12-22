@@ -1,8 +1,9 @@
 # Getting Started
 
-Step 0: make sure that your IDE was ready to use this project :
-jetbrains://idea/settings?name=Build%2C+Execution%2C+Deployment--Build+Tools--Gradle : Gradle JVM 18
-Project Settings - Project - SDK - 18
+Step 0: make sure that your IDE is ready to use this project : 
+
+- jetbrains://idea/settings?name=Build%2C+Execution%2C+Deployment--Build+Tools--Gradle : Gradle JVM 18
+- Project Settings - Project - SDK - 18
 
 How to connect ton-kotlin in your project: 
 
