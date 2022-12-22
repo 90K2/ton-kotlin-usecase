@@ -1,0 +1,4 @@
+
+ton:
+#  net-config: classpath:global-config.json
+  net-config: classpath:testnet-global.config.json
