@@ -53,6 +53,8 @@ Blocks:
 
 [Wallet](src/test/kotlin/org/ton/tonkotlinusecase/WalletTests.kt) `org.ton.tonkotlinusecase.WalletTests`
 
+Before start you need to set wallet seed phrase in env variable `WALLET_MNEMONIC` or directly inside application.yml
+
 - get wallet seqno
 - send TONs
 - deploy nft

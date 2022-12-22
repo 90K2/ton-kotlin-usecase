@@ -3,6 +3,7 @@ package org.ton.tonkotlinusecase
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.block.AddrStd
@@ -29,14 +30,12 @@ class WalletTests: BaseTest() {
     @Autowired
     private lateinit var liteContract: LiteContract
 
-    private val seed = arrayOf(
-        "exist", "trigger", "frost", "arena", "grant", "talk", "laugh", "neck", "claim", "badge", "wing", "sentence",
-        "rotate", "hurdle", "fluid", "share", "rent", "attack", "age", "pencil", "heart", "menu", "keen", "wage"
-    )
+    @Value("\${ton.wallet.mnemonic}")
+    private lateinit var seedPhrase: Array<String>
 
     private fun getWallet(): WalletV4R2 {
         return runBlocking {
-            val keyPair = Mnemonic.toKeyPair(seed)
+            val keyPair = Mnemonic.toKeyPair(seedPhrase)
             val privateKey = PrivateKeyEd25519(keyPair.second)
             WalletV4R2(liteApi = liteClient.liteApi, privateKey = privateKey)
         }

@@ -2,3 +2,5 @@
 ton:
 #  net-config: classpath:global-config.json
   net-config: classpath:testnet-global.config.json
+  wallet:
+    mnemonic: ${WALLET_MNEMONIC}
