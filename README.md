@@ -12,7 +12,7 @@ repositories {
 	maven { url = uri("https://jitpack.io") }
 }
 
-implementation("org.ton:ton-kotlin:0.1.1")
+implementation("org.ton:ton-kotlin:0.2.1")
 
 ```
 
