@@ -28,7 +28,10 @@ class WalletTests: BaseTest() {
 
     private fun getWallet(): WalletV4R2 {
         return runBlocking {
-            val keyPair = Mnemonic.toKeyPair(seedPhrase)
+            val keyPair = Mnemonic.toKeyPair(arrayOf(
+                "exist", "trigger", "frost", "arena", "grant", "talk", "laugh", "neck", "claim", "badge", "wing", "sentence",
+                "rotate", "hurdle", "fluid", "share", "rent", "attack", "age", "pencil", "heart", "menu", "keen", "wage"
+            ))
             val privateKey = PrivateKeyEd25519(keyPair.second)
             WalletV4R2(liteApi = liteClient.liteApi, privateKey = privateKey)
         }

@@ -21,7 +21,7 @@ class TonBeansConfig {
     @Bean("tonlibra-config-reader")
     fun tonConfig() = TonChainConfigReader()
 
-//    @Bean
+    @Bean
     fun liteClient(tonChainConfigReader: TonChainConfigReader): LiteClient {
         return LiteClient(
             liteClientConfigGlobal = LiteClientConfigGlobal(
@@ -33,7 +33,7 @@ class TonBeansConfig {
         )
     }
 
-    @Bean
+//    @Bean
     fun liteClientWithCheck(tonChainConfigReader: TonChainConfigReader): LiteClient {
         val configList = tonChainConfigReader.load().liteservers
         val nearestNodesList = mutableListOf<TonChainConfigReader.TonNetConfig.LiteServerParams>()
