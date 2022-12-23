@@ -1,7 +1,6 @@
 package org.ton.tonkotlinusecase.client
 
 import org.springframework.stereotype.Component
-import org.ton.api.exception.TvmException
 import org.ton.api.tonnode.TonNodeBlockId
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.bigint.BigInt
@@ -56,25 +55,25 @@ class TonClient(
         workchain = workchain,
         shard = descr.next_validator_shard.toLong(),
         seqno = descr.seq_no.toInt(),
-        root_hash = descr.root_hash,
-        file_hash = descr.file_hash
+        root_hash = descr.root_hash.toByteArray(),
+        file_hash = descr.file_hash.toByteArray()
     )
 
 
     suspend fun collectTransactions(block: Block, blockWc: Int, liteClient: LiteClient): MutableList<TonTxRawDTO> {
         val txs = mutableListOf<TonTxRawDTO>()
 
-        block.extra.account_blocks.nodes().forEach {
+        block.extra.account_blocks.value.nodes().forEach {
             it.first.transactions.nodes().forEach {
                 txs.add(TonTxRawDTO(it.first, block.info.seq_no.toInt(), blockWc))
             }
         }
 
-        block.extra.custom.value?.shard_hashes?.nodes()?.forEach {
+        block.extra.custom.value?.value?.shard_hashes?.nodes()?.forEach {
             val workchain = BigInt(it.first.toByteArray()).toInt()
             it.second.nodes().toList().forEach {
                 val shardBlock = getBlockId(workchain, it)
-                liteClient.getBlock(shardBlock)?.extra?.account_blocks?.nodes()?.forEach {
+                liteClient.getBlock(shardBlock)?.extra?.account_blocks?.value?.nodes()?.forEach {
                     it.first.transactions.nodes().forEach {
                         txs.add(TonTxRawDTO(it.first, shardBlock.seqno, workchain))
                     }

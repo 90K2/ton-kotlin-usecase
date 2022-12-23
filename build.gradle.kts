@@ -22,7 +22,9 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 
-	implementation("org.ton:ton-kotlin:0.1.1")
+	implementation("org.ton:ton-kotlin:0.2.1")
+
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.2")
 

@@ -10,6 +10,7 @@ import org.ton.cell.CellBuilder
 import org.ton.crypto.hex
 import org.ton.lite.api.LiteApi
 import org.ton.lite.api.liteserver.LiteServerSendMsgStatus
+import org.ton.lite.api.liteserver.functions.LiteServerSendMessage
 import org.ton.tonkotlinusecase.constants.SendMode
 
 class WalletV4R2(
@@ -35,16 +36,18 @@ class WalletV4R2(
         body: Cell? = null,
         destinationStateInit: StateInit? = null,
     ): LiteServerSendMsgStatus {
-
-        return liteApi.sendMessage(
-            createTransferMessageV2(
-                dest = dest,
-                bounce = bounce ?: true,
-                amount = Coins.ofNano(value),
-                seqno = seqno(),
-                payload = body ?: CellBuilder.createCell {},
-                sendMode = SendMode.PAY_GAS_SEPARATELY,
-                destinationStateInit = destinationStateInit
+        val message = createTransferMessageV2(
+            dest = dest,
+            bounce = bounce ?: true,
+            amount = Coins.ofNano(value),
+            seqno = seqno(),
+            payload = body ?: CellBuilder.createCell {},
+            sendMode = SendMode.PAY_GAS_SEPARATELY,
+            destinationStateInit = destinationStateInit
+        )
+        return liteApi(
+            LiteServerSendMessage(
+                message
             )
         )
     }

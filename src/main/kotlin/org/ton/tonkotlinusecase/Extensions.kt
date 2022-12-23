@@ -6,8 +6,10 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
 import org.ton.tlb.storeTlb
 import java.math.BigDecimal
+import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import java.util.*
 
 fun CellSlice.loadRemainingBits(): BitString {
     return BitString((this.bitsPosition until this.bits.size).map { this.loadBit() })
@@ -51,3 +53,15 @@ fun Long.fromNano() = BigDecimal(this)
     .divide(BigDecimal(NANOCOIN))
 
 fun BigDecimal.toNano(): Long = this.toDouble().toNano()
+
+fun ipv4IntToStr(ip: Int): String {
+    return String.format(
+        Locale.US, "%d.%d.%d.%d",
+        ip shr 24 and 0xff,
+        ip shr 16 and 0xff,
+        ip shr 8 and 0xff,
+        ip and 0xff
+    )
+}
+
+fun utcTsNow() = Timestamp.valueOf(utcNow())

@@ -1,6 +1,5 @@
 package org.ton.tonkotlinusecase.contracts
 
-import org.ton.tonkotlinusecase.contracts.nft.AbstractNftContract
 import kotlinx.coroutines.delay
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.block.*
@@ -9,6 +8,7 @@ import org.ton.lite.api.liteserver.LiteServerAccountId
 import org.ton.lite.client.LiteClient
 import org.ton.tlb.loadTlb
 import org.ton.tonkotlinusecase.constants.ContractMethods
+import org.ton.tonkotlinusecase.contracts.nft.AbstractNftContract
 import org.ton.tonkotlinusecase.toAddrString
 
 /**

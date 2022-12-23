@@ -7,13 +7,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.block.AddrStd
-import org.ton.block.Coins
-import org.ton.block.StateInit
-import org.ton.block.VmStackTinyInt
-import org.ton.cell.Cell
-import org.ton.cell.CellBuilder
-import org.ton.lite.api.liteserver.LiteServerAccountId
-import org.ton.lite.api.liteserver.LiteServerSendMsgStatus
 import org.ton.lite.client.LiteClient
 import org.ton.mnemonic.Mnemonic
 import org.ton.tonkotlinusecase.contracts.LiteContract
