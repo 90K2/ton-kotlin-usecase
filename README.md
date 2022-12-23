@@ -59,3 +59,7 @@ Before start you need to set wallet seed phrase in env variable `WALLET_MNEMONIC
 - send TONs
 - deploy nft
 - transfer nft
+
+#### Advanced options 
+
+- [Workaround for building LiteClient on nearest and live liteserver only](https://github.com/90K2/ton-kotlin-usecase/blob/master/src/main/kotlin/org/ton/tonkotlinusecase/config/TonlibBeanConfig.kt#L37)
