@@ -25,11 +25,11 @@ open class LiteContract(
         get() = TODO("Not yet implemented")
 
     suspend fun isContractDeployed(address: String): Boolean {
-        return liteClient.getAccount(LiteServerAccountId(AddrStd(address)))?.storage?.state is AccountActive
+        return (liteClient.getAccount(LiteServerAccountId(AddrStd(address))) as AccountInfo)?.storage?.state is AccountActive
     }
 
     suspend fun isContractDeployed(address: AddrStd): Boolean {
-        return liteClient.getAccount(LiteServerAccountId(address))?.storage?.state is AccountActive
+        return (liteClient.getAccount(LiteServerAccountId(address)) as AccountInfo)?.storage?.state is AccountActive
     }
 
     private suspend fun runSmcRetry(

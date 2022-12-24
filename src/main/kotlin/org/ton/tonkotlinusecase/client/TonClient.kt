@@ -25,10 +25,10 @@ class TonClient(
      * @address :base64 user friendly address string
      */
     suspend fun getAccount(address: String): AccountInfo? {
-        return liteClient.getAccount(address)
+        return liteClient.getAccount(address) as AccountInfo
     }
     suspend fun getAccount(address: AddrStd): AccountInfo? {
-        return liteClient.getAccount(LiteServerAccountId(address))
+        return liteClient.getAccount(LiteServerAccountId(address)) as AccountInfo
     }
 
     /**
