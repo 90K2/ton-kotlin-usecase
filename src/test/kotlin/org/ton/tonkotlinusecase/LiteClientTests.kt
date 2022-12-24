@@ -36,11 +36,18 @@ class LiteClientTests: BaseTest() {
 
     @Test
     fun `get last masterchain block`() {
-        val lastMCblock = runBlocking {
+        val lastMCblockId = runBlocking {
             liteClient.getLastBlockId()
         }
-        val seqno = lastMCblock.seqno
+        val seqno = lastMCblockId.seqno
         println(seqno)
+        assertTrue(seqno > 0)
+
+        val lastBlock = runBlocking {
+            liteClient.getBlock(lastMCblockId)
+        }
+
+        assertTrue(lastBlock?.info != null )
     }
 
     @Test
