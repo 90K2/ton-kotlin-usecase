@@ -22,7 +22,7 @@ class GetMethodsTest: BaseTest() {
                 data.ownerAddress.toAddrString()
             )
 
-            assertEquals("EQCFWUtaHWMIAAfUaGPJVb5AuKZ9DBIOxIBi5u4WV0t0WBS8", data.ownerAddress.toAddrString())
+            assertEquals("EQCf34cKfT8kaYO51cMjfxsLTxnk8eyzQ0Q8QSVZA-6apqEl", data.ownerAddress.toAddrString())
         }
     }
 

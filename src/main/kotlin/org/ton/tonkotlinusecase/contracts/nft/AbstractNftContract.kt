@@ -23,23 +23,18 @@ abstract class AbstractNftContract(
     abstract val address: AddrStd
 
     // init storage
-    override fun createDataInit(): Cell = CellBuilder.createCell {
+    fun createDataInit(): Cell = CellBuilder.createCell {
         storeUInt(0, 64) // index
         storeTlb(MsgAddress, collectionAddress ?: AddrNone)
         storeTlb(MsgAddress, ownerAddress) // owner address
         storeRefs(packOffChainMetadata(metadataUrl))
     }
 
-    override fun createExternalInitMessage(): Message<Cell> {
-        TODO("Not yet implemented")
-    }
-
-    override fun toString(): String = name
 
     companion object {
         data class Content(
             var metadataUrl: String? = null,
-            var contentRaw: Cell = Cell.of()
+            var contentRaw: Cell = Cell()
         )
 
         fun packTransferOwnership(newOwner: AddrStd, forwardAmount: Long, queryId: Long? = null, currentOwner: AddrStd? = null) =

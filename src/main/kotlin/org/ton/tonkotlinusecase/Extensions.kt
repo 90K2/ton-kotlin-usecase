@@ -4,6 +4,9 @@ import org.ton.bitstring.BitString
 import org.ton.block.*
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.crypto.Ed25519
+import org.ton.lite.api.liteserver.LiteServerAccountId
+import org.ton.mnemonic.Mnemonic
 import org.ton.tlb.storeTlb
 import java.math.BigDecimal
 import java.sql.Timestamp
@@ -28,9 +31,18 @@ fun MsgAddress.toAddrString() = (this as AddrStd).toString(true)
 
 fun AccountState?.getState(): StateInit? {
     return when (this) {
-        is AccountActive -> this.init
+        is AccountActive -> this.value
         else -> null
     }
+}
+
+fun LiteServerAccountId(address: AddrStd): LiteServerAccountId = LiteServerAccountId(
+    address.workchainId, address.address.toByteArray()
+)
+
+fun Mnemonic.toKeyPair(mnemonic: List<String>, password: String = ""): Pair<ByteArray, ByteArray> {
+    val sk = toSeed(mnemonic, password)
+    return Pair(Ed25519.publicKey(sk), sk)
 }
 
 fun BitString.clone() = BitString.of(this.toByteArray(), this.size)

@@ -4,10 +4,7 @@ import org.springframework.stereotype.Component
 import org.ton.api.tonnode.TonNodeBlockId
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.bigint.BigInt
-import org.ton.block.AccountInfo
-import org.ton.block.AddrStd
-import org.ton.block.Block
-import org.ton.block.ShardDescr
+import org.ton.block.*
 import org.ton.lite.api.liteserver.LiteServerAccountId
 import org.ton.lite.client.LiteClient
 import org.ton.tonkotlinusecase.dto.TonTxDTO
@@ -24,11 +21,10 @@ class TonClient(
     /**
      * @address :base64 user friendly address string
      */
-    suspend fun getAccount(address: String): AccountInfo? {
-        return liteClient.getAccount(address) as AccountInfo
-    }
+    suspend fun getAccount(address: String): AccountInfo? = getAccount(AddrStd(address))
+
     suspend fun getAccount(address: AddrStd): AccountInfo? {
-        return liteClient.getAccount(LiteServerAccountId(address)) as AccountInfo
+        return liteClient.getAccountState(address).account.value as AccountInfo
     }
 
     /**
@@ -51,36 +47,39 @@ class TonClient(
         return collectTransactions(block, wc, liteClient)
     }
 
-    private fun getBlockId(workchain: Int, descr: ShardDescr) = TonNodeBlockIdExt(
+    private fun getBlockId(workchain: Int, descr: ShardDescrNew) = TonNodeBlockIdExt(
         workchain = workchain,
-        shard = descr.next_validator_shard.toLong(),
-        seqno = descr.seq_no.toInt(),
-        root_hash = descr.root_hash.toByteArray(),
-        file_hash = descr.file_hash.toByteArray()
+        shard = descr.nextValidatorShard.toLong(),
+        seqno = descr.seqNo.toInt(),
+        rootHash = descr.rootHash.toByteArray(),
+        fileHash = descr.fileHash.toByteArray()
     )
 
 
     suspend fun collectTransactions(block: Block, blockWc: Int, liteClient: LiteClient): MutableList<TonTxRawDTO> {
         val txs = mutableListOf<TonTxRawDTO>()
 
-        block.extra.account_blocks.value.nodes().forEach {
-            it.first.transactions.nodes().forEach {
-                txs.add(TonTxRawDTO(it.first, block.info.seq_no.toInt(), blockWc))
+        block.extra.value.accountBlocks.value.iterator().forEach {
+            it.second.value?.transactions?.iterator()?.forEach {
+                it.second.value?.value?.let { tx ->
+                    txs.add(TonTxRawDTO(tx, block.info.value.seqNo, blockWc))
+                }
             }
         }
-
-        block.extra.custom.value?.value?.shard_hashes?.nodes()?.forEach {
+        block.extra.value.custom.value?.value?.shardHashes?.iterator()?.forEach {
             val workchain = BigInt(it.first.toByteArray()).toInt()
             it.second.nodes().toList().forEach {
-                val shardBlock = getBlockId(workchain, it)
-                liteClient.getBlock(shardBlock)?.extra?.account_blocks?.value?.nodes()?.forEach {
-                    it.first.transactions.nodes().forEach {
-                        txs.add(TonTxRawDTO(it.first, shardBlock.seqno, workchain))
+                val shardBlock = getBlockId(workchain, it as ShardDescrNew)
+                liteClient.getBlock(shardBlock)?.extra?.value?.accountBlocks?.value?.iterator()?.forEach {
+                    it.second.value?.transactions?.iterator()?.forEach {
+                        it.second.value?.value?.let { tx ->
+                            txs.add(TonTxRawDTO(tx, shardBlock.seqno, workchain))
+                        }
                     }
                 }
             }
         }
-        println("block $blockWc:${block.info.seq_no} found ${txs.size} txs inside")
+        println("block $blockWc:${block.info.value.seqNo} found ${txs.size} txs inside")
         return txs
     }
 }

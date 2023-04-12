@@ -8,15 +8,10 @@ Step 0: make sure that your IDE is ready to use this project :
 How to connect ton-kotlin in your project: 
 
 ```groovy
-repositories {
-	maven { url = uri("https://jitpack.io") }
-}
-
-implementation("org.ton:ton-kotlin:0.2.4")
+implementation("org.ton:ton-kotlin:0.2.16")
 
 ```
 
-Jitpack repo is needed because of `ton-kotlin` dependency `kotlinio-base64`  
 
 Blockchain config file setup over `application.yml`
 
