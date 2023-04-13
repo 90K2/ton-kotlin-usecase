@@ -13,8 +13,10 @@ import org.ton.block.AccountActive
 import org.ton.block.AccountInfo
 import org.ton.block.AccountNone
 import org.ton.block.AccountUninit
-import org.ton.crypto.base64
+import org.ton.crypto.encoding.base64
 import org.ton.lite.client.LiteClient
+import org.ton.tl.ByteString
+import org.ton.tl.ByteString.Companion.toByteString
 import org.ton.tonkotlinusecase.client.TonClient
 import org.ton.tonkotlinusecase.constants.OpCodes
 import org.ton.tonkotlinusecase.dto.TonMsgAction
@@ -55,7 +57,9 @@ class LiteClientTests: BaseTest() {
         val liteClient = LiteClient(
             liteClientConfigGlobal = LiteClientConfigGlobal(
                 liteServers = listOf(
-                    LiteServerDesc(id = PublicKeyEd25519(base64("n4VDnSCUuSpjnCyUk9e3QOOd6o0ItSWYbTnW3Wnn8wk=")), ip = 84478511, port = 19949)
+                    LiteServerDesc(id = PublicKeyEd25519(
+                        base64("n4VDnSCUuSpjnCyUk9e3QOOd6o0ItSWYbTnW3Wnn8wk=").toByteString()
+                    ), ip = 84478511, port = 19949)
                 )
             ),
             coroutineContext = Dispatchers.Default
@@ -76,7 +80,7 @@ class LiteClientTests: BaseTest() {
             val data2 = tonClient.getAccount("EQCGU_793GU8o4MucRH2-gUfJLWrTMIjpXQxrNo8w7sKTzfq")
 
             // assume that uninitialized account is OK
-            assertTrue(data2?.storage?.state is AccountUninit)
+            assertTrue(data2?.storage?.state == null)
         }
     }
 
@@ -96,12 +100,12 @@ class LiteClientTests: BaseTest() {
     fun `read ton transfer with comment`() {
         runBlocking {
 
-            val r = tonClient.loadBlockTransactions(liteClient, 0, 30756696)
+            val r = tonClient.loadBlockTransactions(liteClient, 0, 34368151)
 
-            // Receiving TONs with comment from Wallet Bot https://ton.cx/tx/31630224000003:yU0l55aqOp4RMf+Vd+QnJ8XXWkwWV8UfsHvsnmftR4s=:EQDKe51uyQ_SKhrdqP5uCBMMcUOJMvvFUEy4q9BLGXeXApPc
-            val tx = r.firstOrNull { it.hash == "b9dd788e21d8659b63976314251338ba8c69230757d54369a3e248fdbc659d41" }
+            // https://ton.cx/tx/36779786000003:bakFy0AKcIysTKaP2VNvQw1PU2cTphWbcmhOmWjUm1A=:EQD5JYfff8SH8xxAEFE0-rouw7T8e1JyKIS96LynloPNcYod
+            val tx = r.firstOrNull { it.hash == "6da905cb400a708cac4ca68fd9536f430d4f536713a6159b72684e9968d49b50" }
 
-            assertEquals("Get 50 TON from TON Foundation https://ton.events/airdrop", tx?.inMsg?.comment)
+            assertEquals("#1580 [Both are even] t.me/KubikiGame", tx?.inMsg?.comment)
             assertEquals(TonMsgAction.TRANSFER, tx?.inMsg?.msgAction)
         }
     }
@@ -109,11 +113,10 @@ class LiteClientTests: BaseTest() {
     @Test
     fun `read notification about new nft`() {
         runBlocking {
-            val r = tonClient.loadBlockTransactions(liteClient, 0, 26584176)
+            val r = tonClient.loadBlockTransactions(liteClient, 0, 34368174)
 
-            // Notify about receiving  NFT from EQC6OFk_mw0qz4kw10A8_4W9qbQIxojHfGyLtWJ-vxITPh3t
-            // https://ton.cx/tx/28776812000005:diL2hpETxFfIrp2Tr9fOW2+MwiWclm91TCIDFlTRjHY=:EQDcUJhURuwR5mWAf5iYOw2TZ4CJm0gWRMo0laWRu20eSnQv
-            val tx = r.firstOrNull { it.hash == "7622f6869113c457c8ae9d93afd7ce5b6f8cc2259c966f754c22031654d18c76" }
+            // https://ton.cx/tx/36779810000007:404XwwvLLM7tdIEYOb9iLYXtdjU9r2XEufuK1YyOJfs=:EQDISS1kC3hW5NSL2xOE8U9XWXLGGnoPCrFX3zRJLQZ67f06
+            val tx = r.firstOrNull { it.hash == "e34e17c30bcb2cceed74811839bf622d85ed76353daf65c4b9fb8ad58c8e25fb" }
 
             assertTrue(tx?.inMsg?.op?.toInt() == OpCodes.OP_NFT_OWNERSHIP_ASSIGNED)
         }

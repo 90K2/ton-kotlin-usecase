@@ -13,6 +13,7 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
 	mavenCentral()
+	maven("https://s01.oss.sonatype.org/service/local/repositories/snapshots/content/")
 }
 
 dependencies {
@@ -21,8 +22,8 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 
-	implementation("org.ton:ton-kotlin:0.2.16")
-
+//	implementation("org.ton:ton-kotlin:0.2.16")
+	implementation("org.ton:ton-kotlin:0.3.0-SNAPSHOT")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.2")

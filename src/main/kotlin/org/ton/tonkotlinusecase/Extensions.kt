@@ -4,10 +4,12 @@ import org.ton.bitstring.BitString
 import org.ton.block.*
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.contract.wallet.WalletTransfer
 import org.ton.crypto.Ed25519
 import org.ton.lite.api.liteserver.LiteServerAccountId
 import org.ton.mnemonic.Mnemonic
 import org.ton.tlb.storeTlb
+import org.ton.tonkotlinusecase.constants.SendMode
 import java.math.BigDecimal
 import java.sql.Timestamp
 import java.time.LocalDateTime
@@ -43,6 +45,17 @@ fun LiteServerAccountId(address: AddrStd): LiteServerAccountId = LiteServerAccou
 fun Mnemonic.toKeyPair(mnemonic: List<String>, password: String = ""): Pair<ByteArray, ByteArray> {
     val sk = toSeed(mnemonic, password)
     return Pair(Ed25519.publicKey(sk), sk)
+}
+
+fun List<Pair<String, Long>>.toWalletTransfer() = this.map {
+    WalletTransfer {
+        destination = AddrStd(it.first)
+        coins = Coins.ofNano(it.second)
+        bounceable = true
+        body = null
+        stateInit = null
+        sendMode = SendMode.PAY_GAS_SEPARATELY
+    }
 }
 
 fun BitString.clone() = BitString.of(this.toByteArray(), this.size)

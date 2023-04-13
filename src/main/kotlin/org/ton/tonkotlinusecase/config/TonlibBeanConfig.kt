@@ -8,8 +8,9 @@ import org.ton.api.liteclient.config.LiteClientConfigGlobal
 import org.ton.api.liteserver.LiteServerDesc
 import org.ton.api.pub.PublicKeyEd25519
 import org.ton.api.validator.config.ValidatorConfigGlobal
-import org.ton.crypto.base64
+import org.ton.crypto.encoding.base64
 import org.ton.lite.client.LiteClient
+import org.ton.tl.ByteString.Companion.toByteString
 import org.ton.tonkotlinusecase.contracts.LiteContract
 import org.ton.tonkotlinusecase.ipv4IntToStr
 import org.ton.tonkotlinusecase.utcTsNow
@@ -26,7 +27,7 @@ class TonBeansConfig {
         return LiteClient(
             liteClientConfigGlobal = LiteClientConfigGlobal(
                 liteServers = tonChainConfigReader.load().liteservers.map {
-                    LiteServerDesc(id = PublicKeyEd25519(base64(it.id.key)), ip = it.ip, port = it.port)
+                    LiteServerDesc(id = PublicKeyEd25519(base64(it.id.key).toByteString()), ip = it.ip, port = it.port)
                 }
             ),
             coroutineContext = Dispatchers.Default
@@ -42,7 +43,7 @@ class TonBeansConfig {
             val liteClient = LiteClient(
                 liteClientConfigGlobal = LiteClientConfigGlobal(
                     liteServers = listOf(
-                        LiteServerDesc(id = PublicKeyEd25519(base64(it.id.key)), ip = it.ip, port = it.port)
+                        LiteServerDesc(id = PublicKeyEd25519(base64(it.id.key).toByteString()), ip = it.ip, port = it.port)
                     ),
                     validator = ValidatorConfigGlobal()
                 ),
@@ -70,7 +71,7 @@ class TonBeansConfig {
         return LiteClient(
             liteClientConfigGlobal =  LiteClientConfigGlobal(
                 liteServers = (nearestNodesList.takeIf { it.isNotEmpty() } ?: configList ).map {
-                    LiteServerDesc(id = PublicKeyEd25519(base64(it.id.key)), ip = it.ip, port = it.port)
+                    LiteServerDesc(id = PublicKeyEd25519(base64(it.id.key).toByteString()), ip = it.ip, port = it.port)
                 },
                 validator = ValidatorConfigGlobal()
             ),

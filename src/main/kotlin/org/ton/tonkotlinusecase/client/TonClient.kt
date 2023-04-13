@@ -24,7 +24,12 @@ class TonClient(
     suspend fun getAccount(address: String): AccountInfo? = getAccount(AddrStd(address))
 
     suspend fun getAccount(address: AddrStd): AccountInfo? {
-        return liteClient.getAccountState(address).account.value as AccountInfo
+        val account = liteClient.getAccountState(address).account.value
+        return when (account) {
+                is AccountInfo -> account as AccountInfo
+                is AccountNone -> null
+                else -> null
+        }
     }
 
     /**

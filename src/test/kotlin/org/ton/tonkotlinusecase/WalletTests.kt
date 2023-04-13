@@ -1,15 +1,31 @@
 package org.ton.tonkotlinusecase
 
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.block.AddrStd
+import org.ton.block.Coins
+import org.ton.block.StateInit
+import org.ton.boc.BagOfCells
+import org.ton.cell.Cell
+import org.ton.cell.CellBuilder
+import org.ton.cell.buildCell
+import org.ton.contract.wallet.HighLoadWalletV2Contract
+import org.ton.contract.wallet.WalletContract
+import org.ton.contract.wallet.WalletTransfer
 import org.ton.contract.wallet.WalletV4R2Contract
+import org.ton.crypto.hex
+import org.ton.hashmap.HashMapE
 import org.ton.lite.client.LiteClient
 import org.ton.mnemonic.Mnemonic
+import org.ton.tlb.constructor.tlbCodec
+import org.ton.tlb.storeTlb
+import org.ton.tonkotlinusecase.constants.SendMode
+import org.ton.tonkotlinusecase.contracts.HighloadWallet
 import org.ton.tonkotlinusecase.contracts.LiteContract
 import org.ton.tonkotlinusecase.contracts.nft.AbstractNftContract
 
@@ -46,6 +62,39 @@ class WalletTests: BaseTest() {
             println(
                 wallet.getSeqno()
             )
+        }
+    }
+
+    @Test
+    fun `highload wallet`() {
+        val seed = listOf(
+            "winner","catch","pistol","police","rebel","below","island","grief","identify","violin",
+            "trophy","party","lock","fold","shoulder","resemble","net","catalog","change","tunnel",
+            "witness","bunker","apart","liquid"
+        )
+        val privateKey = PrivateKeyEd25519(Mnemonic.toSeed(seed))
+
+        val w = HighloadWallet(privateKey)
+
+        assertEquals("EQB8GHeD29YFlSkgqvPfXEAqpyq_1IRiqRbD3E5zp6djSDqt", w.wallet.address.toAddrString())
+
+        val targets = listOf(
+            AddrStd("EQDKe51uyQ_SKhrdqP5uCBMMcUOJMvvFUEy4q9BLGXeXApPc")
+        )
+        runBlocking {
+            w.transfer(liteClient.liteApi, targets.map {
+                WalletTransfer {
+                    destination = it
+                    coins = Coins.ofNano(0.21.toNano())
+                    bounceable = true
+                    body = buildCell {
+                        storeUInt(0, 32)
+                        storeBytes("Comment".toByteArray())
+                    }
+                    stateInit = null
+                    sendMode = SendMode.PAY_GAS_SEPARATELY
+                }
+            })
         }
     }
 
