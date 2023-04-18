@@ -67,11 +67,7 @@ class WalletTests: BaseTest() {
 
     @Test
     fun `highload wallet`() {
-        val seed = listOf(
-            "winner","catch","pistol","police","rebel","below","island","grief","identify","violin",
-            "trophy","party","lock","fold","shoulder","resemble","net","catalog","change","tunnel",
-            "witness","bunker","apart","liquid"
-        )
+        val seed = seedPhrase.toList()
         val privateKey = PrivateKeyEd25519(Mnemonic.toSeed(seed))
 
         val w = HighloadWallet(privateKey)

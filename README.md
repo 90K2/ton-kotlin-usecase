@@ -8,8 +8,15 @@ Step 0: make sure that your IDE is ready to use this project :
 How to connect ton-kotlin in your project: 
 
 ```groovy
-implementation("org.ton:ton-kotlin:0.2.16")
+repositories {
+    mavenCentral()
+    maven("https://s01.oss.sonatype.org/service/local/repositories/snapshots/content/")
+}
+dependencies {
+    implementation("org.ton:ton-kotlin-jvm:0.3.0-20230412.120307-1")
+    implementation("org.ton:ton-kotlin-contract-jvm:0.3.0-20230412.120307-1")
 
+}
 ```
 
 
