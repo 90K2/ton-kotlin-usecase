@@ -85,7 +85,7 @@ class WalletTests: BaseTest() {
             w.transfer(liteClient.liteApi, targets.map {
                 WalletTransfer {
                     destination = it
-                    coins = Coins.ofNano(0.21.toNano())
+                    coins = Coins.ofNano(0.000001.toNano())
                     bounceable = true
                     body = buildCell {
                         storeUInt(0, 32)

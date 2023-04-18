@@ -23,7 +23,9 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 
 //	implementation("org.ton:ton-kotlin:0.2.16")
-	implementation("org.ton:ton-kotlin:0.3.0-SNAPSHOT")
+	implementation("org.ton:ton-kotlin-jvm:0.3.0-20230412.120307-1")
+	implementation("org.ton:ton-kotlin-contract-jvm:0.3.0-20230412.120307-1")
+
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.2")

@@ -52,8 +52,6 @@ fun List<Pair<String, Long>>.toWalletTransfer() = this.map {
         destination = AddrStd(it.first)
         coins = Coins.ofNano(it.second)
         bounceable = true
-        body = null
-        stateInit = null
         sendMode = SendMode.PAY_GAS_SEPARATELY
     }
 }
