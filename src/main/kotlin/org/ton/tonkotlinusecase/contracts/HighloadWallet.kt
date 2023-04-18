@@ -113,7 +113,7 @@ class HighloadWallet(
             storeInt(subWalletId, 32)
             storeInt(generateQueryId(BigInt.valueOf(60)), 64)
             storeTlb(
-                HashMapE.tlbCodec(16, WalletMessage.tlbCodec(Cell.tlbCodec())),
+                HashMapE.tlbCodec(16, WalletMessage.tlbCodec(AnyTlbConstructor)),
                 payloadToDict(
                     transfers.map {
                         WalletMessage(
