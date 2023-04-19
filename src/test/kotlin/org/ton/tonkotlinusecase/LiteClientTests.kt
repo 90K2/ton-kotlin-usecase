@@ -11,6 +11,7 @@ import org.ton.api.liteserver.LiteServerDesc
 import org.ton.api.pub.PublicKeyEd25519
 import org.ton.block.AccountActive
 import org.ton.block.AccountInfo
+import org.ton.block.AddrStd
 import org.ton.crypto.encoding.base64
 import org.ton.lite.client.LiteClient
 import org.ton.tl.ByteString.Companion.toByteString
@@ -117,5 +118,25 @@ class LiteClientTests: BaseTest() {
 
             assertTrue(tx?.inMsg?.op?.toInt() == OpCodes.OP_NFT_OWNERSHIP_ASSIGNED)
         }
+    }
+
+    @Test
+    fun `get address transactions`() {
+        val address = "EQCSP1xhpNpQmIIYDwbMs2lZmy6ep496v3JfIy__DTH6ZqJ2"
+        runBlocking {
+            val account = liteClient.getAccountState(AddrStd(address))
+
+            val txs = (account.lastTransactionId?.let {
+                liteClient.getTransactions(
+                    accountAddress = AddrStd(address),
+                    fromTransactionId = account.lastTransactionId!!,
+                    count = 10
+                )
+            } ?: listOf()).map {
+                tonMapper.mapTx(it.transaction.value, it.blockId.seqno, it.blockId.workchain)
+            }
+            println(txs)
+        }
+
     }
 }
