@@ -1,6 +1,9 @@
 package org.ton.tonkotlinusecase.contracts.nft
 
-import org.ton.block.*
+import org.ton.block.AddrNone
+import org.ton.block.AddrStd
+import org.ton.block.Coins
+import org.ton.block.MsgAddress
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.lite.client.LiteClient

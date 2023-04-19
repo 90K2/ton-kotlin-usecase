@@ -9,25 +9,14 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.block.AddrStd
 import org.ton.block.Coins
-import org.ton.block.StateInit
-import org.ton.boc.BagOfCells
-import org.ton.cell.Cell
-import org.ton.cell.CellBuilder
 import org.ton.cell.buildCell
-import org.ton.contract.wallet.HighLoadWalletV2Contract
-import org.ton.contract.wallet.WalletContract
 import org.ton.contract.wallet.WalletTransfer
 import org.ton.contract.wallet.WalletV4R2Contract
-import org.ton.crypto.hex
-import org.ton.hashmap.HashMapE
 import org.ton.lite.client.LiteClient
 import org.ton.mnemonic.Mnemonic
-import org.ton.tlb.constructor.tlbCodec
-import org.ton.tlb.storeTlb
 import org.ton.tonkotlinusecase.constants.SendMode
 import org.ton.tonkotlinusecase.contracts.HighloadWallet
 import org.ton.tonkotlinusecase.contracts.LiteContract
-import org.ton.tonkotlinusecase.contracts.nft.AbstractNftContract
 
 @SpringBootTest
 class WalletTests: BaseTest() {

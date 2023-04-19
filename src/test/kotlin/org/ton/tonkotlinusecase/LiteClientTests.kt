@@ -11,11 +11,8 @@ import org.ton.api.liteserver.LiteServerDesc
 import org.ton.api.pub.PublicKeyEd25519
 import org.ton.block.AccountActive
 import org.ton.block.AccountInfo
-import org.ton.block.AccountNone
-import org.ton.block.AccountUninit
 import org.ton.crypto.encoding.base64
 import org.ton.lite.client.LiteClient
-import org.ton.tl.ByteString
 import org.ton.tl.ByteString.Companion.toByteString
 import org.ton.tonkotlinusecase.client.TonClient
 import org.ton.tonkotlinusecase.constants.OpCodes

@@ -5,7 +5,6 @@ import org.ton.api.tonnode.TonNodeBlockId
 import org.ton.api.tonnode.TonNodeBlockIdExt
 import org.ton.bigint.BigInt
 import org.ton.block.*
-import org.ton.lite.api.liteserver.LiteServerAccountId
 import org.ton.lite.client.LiteClient
 import org.ton.tonkotlinusecase.dto.TonTxDTO
 import org.ton.tonkotlinusecase.dto.TonTxRawDTO
