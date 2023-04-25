@@ -13,7 +13,7 @@ import org.ton.tonkotlinusecase.contracts.LiteContract
 import org.ton.tonkotlinusecase.utcLongNow
 
 abstract class AbstractNftContract(
-    val liteClient: LiteClient,
+    override val liteClient: LiteClient,
     val ownerAddress: AddrStd,
     val metadataUrl: String,
     open val collectionAddress: AddrStd? = null,
@@ -23,10 +23,10 @@ abstract class AbstractNftContract(
 
     open val commonMetadataUrl: String? = null
 
-    abstract val address: AddrStd
+    abstract override val address: AddrStd
 
     // init storage
-    fun createDataInit(): Cell = CellBuilder.createCell {
+    override fun createDataInit(): Cell = CellBuilder.createCell {
         storeUInt(0, 64) // index
         storeTlb(MsgAddress, collectionAddress ?: AddrNone)
         storeTlb(MsgAddress, ownerAddress) // owner address

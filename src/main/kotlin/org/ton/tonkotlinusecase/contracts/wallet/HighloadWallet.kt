@@ -1,4 +1,4 @@
-package org.ton.tonkotlinusecase.contracts
+package org.ton.tonkotlinusecase.contracts.wallet
 
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.bigint.BigInt
@@ -16,34 +16,32 @@ import org.ton.crypto.hex
 import org.ton.hashmap.HashMapE
 import org.ton.lite.api.LiteApi
 import org.ton.lite.api.LiteApiClient
+import org.ton.lite.client.LiteClient
 import org.ton.tlb.CellRef
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.constructor.tlbCodec
 import org.ton.tlb.storeTlb
+import org.ton.tonkotlinusecase.contracts.SmartContract
 import org.ton.tonkotlinusecase.toWalletTransfer
 import org.ton.tonkotlinusecase.utcLongNow
 
 class HighloadWallet(
     val privateKey: PrivateKeyEd25519,
-    val workchain: Int = 0,
-    val subWalletId: Int = WalletContract.DEFAULT_WALLET_ID + workchain
-) {
+    override val workchain: Int = 0,
+    val subWalletId: Int = WalletContract.DEFAULT_WALLET_ID + workchain,
+    override val liteClient: LiteClient
+): SmartContract(liteClient, workchain) {
 
-    val CODE = BagOfCells(
+    override val CODE = BagOfCells(
         hex("B5EE9C724101090100E5000114FF00F4A413F4BCF2C80B010201200203020148040501EAF28308D71820D31FD33FF823AA1F5320B9F263ED44D0D31FD33FD3FFF404D153608040F40E6FA131F2605173BAF2A207F901541087F910F2A302F404D1F8007F8E16218010F4786FA5209802D307D43001FB009132E201B3E65B8325A1C840348040F4438AE63101C8CB1F13CB3FCBFFF400C9ED54080004D03002012006070017BD9CE76A26869AF98EB85FFC0041BE5F976A268698F98E99FE9FF98FA0268A91040207A0737D098C92DBFC95DD1F140034208040F4966FA56C122094305303B9DE2093333601926C21E2B39F9E545A")
     ).first()
 
-    private fun createDataInit(): Cell = buildCell {
+    override fun createDataInit(): Cell = buildCell {
         storeUInt(subWalletId, 32) // stored_subwallet
         storeUInt(0, 64) // last_cleaned
         storeBytes(privateKey.publicKey().key.toByteArray())
         storeTlb(HashMapE.tlbCodec(16, Cell.tlbCodec()), HashMapE.empty()) // old_queries
     }
-
-    private fun createStateInit() = StateInit(
-        code = CODE,
-        data = createDataInit()
-    )
 
     private fun generateQueryId(timeout: BigInt): BigInt {
         return (BigInt.valueOf(utcLongNow()) + timeout).shiftLeft(32)
@@ -54,14 +52,14 @@ class HighloadWallet(
         init = createStateInit()
     )
 
-    suspend fun transfer(liteApi: LiteApi, transfers: List<WalletTransfer>) {
+    suspend fun transfer(transfers: List<WalletTransfer>) {
         require(transfers.isNotEmpty() && transfers.size <= 254) { throw RuntimeException("wrong transfers size") }
 
         val message = createTransferMessage(
             this.wallet.address as AddrStd, createStateInit(), transfers
         )
         this.wallet.sendExternalMessage(
-            liteApi, AnyTlbConstructor, message
+            liteClient.liteApi, AnyTlbConstructor, message
         )
 
         val queryPayload = HighLoadWalletV2Contract.queryPayload(
@@ -174,8 +172,16 @@ class HighloadWallet(
         return hashMap
     }
 
-    suspend fun transfer(liteApi: LiteApiClient, address: String, amount: Long) {
-        transfer(liteApi, listOf(Pair(address, amount)).toWalletTransfer())
+    suspend fun transfer(address: String, amount: Long) {
+        transfer(listOf(Pair(address, amount)).toWalletTransfer())
     }
 
+    override val address: MsgAddressInt
+        get() = TODO("Not yet implemented")
+    override val state: AccountState
+        get() = TODO("Not yet implemented")
+
+    override fun loadData(): Any? {
+        TODO("Not yet implemented")
+    }
 }

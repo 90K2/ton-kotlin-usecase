@@ -15,8 +15,9 @@ import org.ton.contract.wallet.WalletV4R2Contract
 import org.ton.lite.client.LiteClient
 import org.ton.mnemonic.Mnemonic
 import org.ton.tonkotlinusecase.constants.SendMode
-import org.ton.tonkotlinusecase.contracts.HighloadWallet
+import org.ton.tonkotlinusecase.contracts.wallet.HighloadWallet
 import org.ton.tonkotlinusecase.contracts.LiteContract
+import org.ton.tonkotlinusecase.contracts.wallet.WalletV4R2
 
 @SpringBootTest
 class WalletTests: BaseTest() {
@@ -30,14 +31,18 @@ class WalletTests: BaseTest() {
     @Value("\${ton.wallet.mnemonic}")
     private lateinit var seedPhrase: Array<String>
 
-    private fun getWallet(): WalletV4R2Contract {
+    private fun getWallet(): WalletV4R2 {
         return runBlocking {
-            val keyPair = Mnemonic.toKeyPair(listOf(
-                "exist", "trigger", "frost", "arena", "grant", "talk", "laugh", "neck", "claim", "badge", "wing", "sentence",
-                "rotate", "hurdle", "fluid", "share", "rent", "attack", "age", "pencil", "heart", "menu", "keen", "wage"
-            ))
+//            val m = Mnemonic.generate()
+//            println(m)
+            val m = listOf(
+                "fringe", "slice", "follow", "increase", "lottery", "best", "minute", "speak", "quick", "cat", "happy", "report",
+                "garment", "novel", "dawn", "acid", "update", "cricket", "lecture", "tribe", "urban", "media", "enforce", "shop"
+            )
+            val keyPair = Mnemonic.toKeyPair(m)
+
             val privateKey = PrivateKeyEd25519(keyPair.second)
-            WalletV4R2Contract(0, privateKey.publicKey())
+            WalletV4R2(0, privateKey, liteClient)
         }
     }
 
@@ -59,7 +64,7 @@ class WalletTests: BaseTest() {
         val seed = seedPhrase.toList()
         val privateKey = PrivateKeyEd25519(Mnemonic.toSeed(seed))
 
-        val w = HighloadWallet(privateKey)
+        val w = HighloadWallet(privateKey = privateKey, liteClient = liteClient)
 
         assertEquals("EQB8GHeD29YFlSkgqvPfXEAqpyq_1IRiqRbD3E5zp6djSDqt", w.wallet.address.toAddrString())
 
@@ -67,7 +72,7 @@ class WalletTests: BaseTest() {
             AddrStd("EQDKe51uyQ_SKhrdqP5uCBMMcUOJMvvFUEy4q9BLGXeXApPc")
         )
         runBlocking {
-            w.transfer(liteClient.liteApi, targets.map {
+            w.transfer(targets.map {
                 WalletTransfer {
                     destination = it
                     coins = Coins.ofNano(0.000001.toNano())
@@ -83,20 +88,19 @@ class WalletTests: BaseTest() {
         }
     }
 
-//    @Test
-//    fun `send ton`() {
-//        runBlocking {
-//            val wallet = getWallet()
-//            val myFriendAddress = AddrStd("kQC7ryRspjsMrdnuuA98uGyLMUVd_dDWjroYLBHoIz9ovl7e")
-//            val tonGift = 0.1
-//
-//            wallet.sendInternal(
-//                dest = myFriendAddress,
-//                value = tonGift.toNano()
-//            )
-//
-//        }
-//    }
+    @Test
+    fun `send ton`() {
+        runBlocking {
+            val wallet = getWallet()
+            val myFriendAddress = "kQC7ryRspjsMrdnuuA98uGyLMUVd_dDWjroYLBHoIz9ovl7e"
+            val tonGift = 0.001.toNano()
+
+            runBlocking {
+                wallet.transfer(myFriendAddress, tonGift)
+            }
+
+        }
+    }
 
 //    @Test
 //    fun `deploy nft`() {
