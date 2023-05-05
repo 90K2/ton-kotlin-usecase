@@ -65,3 +65,4 @@ Before start you need to set wallet seed phrase in env variable `WALLET_MNEMONIC
 #### Advanced options 
 
 - [Workaround for building LiteClient on nearest and live liteserver only](https://github.com/90K2/ton-kotlin-usecase/blob/master/src/main/kotlin/org/ton/tonkotlinusecase/config/TonlibBeanConfig.kt#L37)
+- [@TonAddress](src/main/kotlin/org/ton/tonkotlinusecase/validators/TonAddressValidator.kt) constraint validation annotation (no ton-kotlin lib required)

@@ -29,6 +29,8 @@ dependencies {
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.2")
+	implementation("jakarta.validation:jakarta.validation-api:2.0.2")
+
 
 }
 
