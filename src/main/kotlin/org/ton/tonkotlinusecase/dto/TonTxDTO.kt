@@ -26,5 +26,6 @@ data class TonTxDTO(
     val computeSucceed: Boolean?,
     val computeExitCode: Int?,
     val actionSucceed: Boolean?,
-    val actionExitCode: Int?
+    val actionExitCode: Int?,
+    val created: Long
 )

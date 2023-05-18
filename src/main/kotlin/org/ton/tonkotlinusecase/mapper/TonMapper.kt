@@ -143,7 +143,8 @@ class TonMapper {
             computeSucceed = computePh?.success,
             computeExitCode = computePh?.r1?.value?.exitCode,
             actionSucceed = descr?.action?.value?.value?.success,
-            actionExitCode = descr?.action?.value?.value?.resultCode
+            actionExitCode = descr?.action?.value?.value?.resultCode,
+            created = tx.now.toLong()
         )
     }
 
