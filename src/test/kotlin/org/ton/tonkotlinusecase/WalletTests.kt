@@ -10,12 +10,12 @@ import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.block.AddrStd
 import org.ton.block.Coins
 import org.ton.cell.buildCell
+import org.ton.contract.wallet.MessageData
 import org.ton.contract.wallet.WalletTransfer
-import org.ton.contract.wallet.WalletV4R2Contract
 import org.ton.lite.client.LiteClient
 import org.ton.mnemonic.Mnemonic
 import org.ton.tonkotlinusecase.constants.SendMode
-import org.ton.tonkotlinusecase.contracts.wallet.HighloadWallet
+import org.ton.tonkotlinusecase.contracts.wallet.HighloadWalletV2
 import org.ton.tonkotlinusecase.contracts.LiteContract
 import org.ton.tonkotlinusecase.contracts.wallet.WalletV4R2
 
@@ -64,24 +64,26 @@ class WalletTests: BaseTest() {
         val seed = seedPhrase.toList()
         val privateKey = PrivateKeyEd25519(Mnemonic.toSeed(seed))
 
-        val w = HighloadWallet(privateKey = privateKey, liteClient = liteClient)
+        val w = HighloadWalletV2(privateKey = privateKey, liteClient = liteClient)
 
-        assertEquals("EQB8GHeD29YFlSkgqvPfXEAqpyq_1IRiqRbD3E5zp6djSDqt", w.wallet.address.toAddrString())
+        assertEquals("EQB8GHeD29YFlSkgqvPfXEAqpyq_1IRiqRbD3E5zp6djSDqt", w.address().toAddrString())
 
         val targets = listOf(
             AddrStd("EQDKe51uyQ_SKhrdqP5uCBMMcUOJMvvFUEy4q9BLGXeXApPc")
         )
         runBlocking {
-            w.transfer(targets.map {
+            w.transfer(liteClient.liteApi, targets.map {
                 WalletTransfer {
                     destination = it
                     coins = Coins.ofNano(0.000001.toNano())
                     bounceable = true
-                    body = buildCell {
-                        storeUInt(0, 32)
-                        storeBytes("Comment".toByteArray())
-                    }
-                    stateInit = null
+                    messageData = MessageData.raw(
+                        body = buildCell {
+                            storeUInt(0, 32)
+                            storeBytes("Comment".toByteArray())
+                        },
+                        stateInit = null
+                    )
                     sendMode = SendMode.PAY_GAS_SEPARATELY
                 }
             })

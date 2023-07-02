@@ -24,7 +24,6 @@ dependencies {
 
 //	implementation("org.ton:ton-kotlin:0.2.16")
 	implementation("org.ton:ton-kotlin-jvm:0.3.0-20230412.120307-1")
-	implementation("org.ton:ton-kotlin-contract-jvm:0.3.0-20230412.120307-1")
 
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
