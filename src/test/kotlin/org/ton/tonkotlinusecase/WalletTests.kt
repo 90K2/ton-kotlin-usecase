@@ -42,7 +42,7 @@ class WalletTests: BaseTest() {
             val keyPair = Mnemonic.toKeyPair(m)
 
             val privateKey = PrivateKeyEd25519(keyPair.second)
-            WalletV4R2(0, privateKey, liteClient)
+            WalletV4R2(privateKey,0, liteClient = liteClient)
         }
     }
 
@@ -54,8 +54,16 @@ class WalletTests: BaseTest() {
             val wallet = getWallet()
             println(wallet.address.toAddrString())
             println(
-                wallet.getSeqno()
+                wallet.getSeqno(liteClient.liteApi)
             )
+        }
+    }
+
+    @Test
+    fun `wallet v4 transfer`() {
+        runBlocking {
+            val wallet = getWallet()
+            wallet.transfer("EQBbxsN0xtBHk3gilzQ6Diu1Jx6_XIXnnk4Llpx6CySiA6Km", 0.001.toNano())
         }
     }
 

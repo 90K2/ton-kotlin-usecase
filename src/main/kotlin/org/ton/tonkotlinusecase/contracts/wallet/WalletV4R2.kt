@@ -1,7 +1,5 @@
 package org.ton.tonkotlinusecase.contracts.wallet
 
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import org.ton.api.pk.PrivateKeyEd25519
 import org.ton.bitstring.BitString
 import org.ton.block.*
@@ -11,59 +9,37 @@ import org.ton.cell.CellBuilder
 import org.ton.cell.buildCell
 import org.ton.contract.wallet.WalletContract
 import org.ton.contract.wallet.WalletTransfer
-import org.ton.contract.wallet.WalletV4R2Contract
 import org.ton.crypto.encoding.base64
-import org.ton.lite.api.LiteApi
 import org.ton.lite.client.LiteClient
 import org.ton.tlb.CellRef
 import org.ton.tlb.constructor.AnyTlbConstructor
 import org.ton.tlb.storeRef
 import org.ton.tlb.storeTlb
-import org.ton.tonkotlinusecase.contracts.LiteContract
-import org.ton.tonkotlinusecase.contracts.SmartContract
 import org.ton.tonkotlinusecase.toWalletTransfer
 
 
 class WalletV4R2(
-    override val workchain: Int,
-    val privateKey: PrivateKeyEd25519,
-    override val liteClient: LiteClient
-): SmartContract(liteClient, workchain) {
+    privateKey: PrivateKeyEd25519,
+    workchain: Int = 0,
+    subWalletId: Int = WalletContract.DEFAULT_WALLET_ID + workchain,
+    liteClient: LiteClient
+): AbstractWallet(privateKey, workchain, subWalletId, liteClient) {
 
-    val walletId = WalletContract.DEFAULT_WALLET_ID + workchain
-
-    override val CODE = BagOfCells(base64("te6cckECFAEAAtQAART/APSkE/S88sgLAQIBIAIDAgFIBAUE+PKDCNcYINMf0x/THwL4I7vyZO1E0NMf0x/T//QE0VFDuvKhUVG68qIF+QFUEGT5EPKj+AAkpMjLH1JAyx9SMMv/UhD0AMntVPgPAdMHIcAAn2xRkyDXSpbTB9QC+wDoMOAhwAHjACHAAuMAAcADkTDjDQOkyMsfEssfy/8QERITAubQAdDTAyFxsJJfBOAi10nBIJJfBOAC0x8hghBwbHVnvSKCEGRzdHK9sJJfBeAD+kAwIPpEAcjKB8v/ydDtRNCBAUDXIfQEMFyBAQj0Cm+hMbOSXwfgBdM/yCWCEHBsdWe6kjgw4w0DghBkc3RyupJfBuMNBgcCASAICQB4AfoA9AQw+CdvIjBQCqEhvvLgUIIQcGx1Z4MesXCAGFAEywUmzxZY+gIZ9ADLaRfLH1Jgyz8gyYBA+wAGAIpQBIEBCPRZMO1E0IEBQNcgyAHPFvQAye1UAXKwjiOCEGRzdHKDHrFwgBhQBcsFUAPPFiP6AhPLassfyz/JgED7AJJfA+ICASAKCwBZvSQrb2omhAgKBrkPoCGEcNQICEekk30pkQzmkD6f+YN4EoAbeBAUiYcVnzGEAgFYDA0AEbjJftRNDXCx+AA9sp37UTQgQFA1yH0BDACyMoHy//J0AGBAQj0Cm+hMYAIBIA4PABmtznaiaEAga5Drhf/AABmvHfaiaEAQa5DrhY/AAG7SB/oA1NQi+QAFyMoHFcv/ydB3dIAYyMsFywIizxZQBfoCFMtrEszMyXP7AMhAFIEBCPRR8qcCAHCBAQjXGPoA0z/IVCBHgQEI9FHyp4IQbm90ZXB0gBjIywXLAlAGzxZQBPoCFMtqEssfyz/Jc/sAAgBsgQEI1xj6ANM/MFIkgQEI9Fnyp4IQZHN0cnB0gBjIywXLAlAFzxZQA/oCE8tqyx8Syz/Jc/sAAAr0AMntVGliJeU=")).first()
 
     override fun createDataInit() = CellBuilder.createCell {
         storeUInt(0, 32) // seqno
-        storeUInt(walletId, 32)
+        storeUInt(subWalletId, 32)
         storeBytes(privateKey.publicKey().key.toByteArray())
         storeBit(false) // plugins
     }
 
+    override val sourceCode: Cell = BagOfCells(base64("te6cckECFAEAAtQAART/APSkE/S88sgLAQIBIAIDAgFIBAUE+PKDCNcYINMf0x/THwL4I7vyZO1E0NMf0x/T//QE0VFDuvKhUVG68qIF+QFUEGT5EPKj+AAkpMjLH1JAyx9SMMv/UhD0AMntVPgPAdMHIcAAn2xRkyDXSpbTB9QC+wDoMOAhwAHjACHAAuMAAcADkTDjDQOkyMsfEssfy/8QERITAubQAdDTAyFxsJJfBOAi10nBIJJfBOAC0x8hghBwbHVnvSKCEGRzdHK9sJJfBeAD+kAwIPpEAcjKB8v/ydDtRNCBAUDXIfQEMFyBAQj0Cm+hMbOSXwfgBdM/yCWCEHBsdWe6kjgw4w0DghBkc3RyupJfBuMNBgcCASAICQB4AfoA9AQw+CdvIjBQCqEhvvLgUIIQcGx1Z4MesXCAGFAEywUmzxZY+gIZ9ADLaRfLH1Jgyz8gyYBA+wAGAIpQBIEBCPRZMO1E0IEBQNcgyAHPFvQAye1UAXKwjiOCEGRzdHKDHrFwgBhQBcsFUAPPFiP6AhPLassfyz/JgED7AJJfA+ICASAKCwBZvSQrb2omhAgKBrkPoCGEcNQICEekk30pkQzmkD6f+YN4EoAbeBAUiYcVnzGEAgFYDA0AEbjJftRNDXCx+AA9sp37UTQgQFA1yH0BDACyMoHy//J0AGBAQj0Cm+hMYAIBIA4PABmtznaiaEAga5Drhf/AABmvHfaiaEAQa5DrhY/AAG7SB/oA1NQi+QAFyMoHFcv/ydB3dIAYyMsFywIizxZQBfoCFMtrEszMyXP7AMhAFIEBCPRR8qcCAHCBAQjXGPoA0z/IVCBHgQEI9FHyp4IQbm90ZXB0gBjIywXLAlAGzxZQBPoCFMtqEssfyz/Jc/sAAgBsgQEI1xj6ANM/MFIkgQEI9Fnyp4IQZHN0cnB0gBjIywXLAlAFzxZQA/oCE8tqyx8Syz/Jc/sAAAr0AMntVGliJeU=")).first()
+
     override val address = address()
 
-    override val state: AccountState
-        get() = TODO("Not yet implemented")
-
-    override fun loadData(): Any? {
-        TODO("Not yet implemented")
-    }
-
-    suspend fun getSeqno(): Int {
-        val stack = runSmc(address(), "seqno")
-        return stack?.toMutableVmStack()?.popInt()?.toInt() ?: 0
-    }
 
     suspend fun transfer(address: String, amount: Long) {
         transfer(transfers = listOf(Pair(address, amount)).toWalletTransfer().toTypedArray())
-    }
-
-    suspend fun transfer(
-        vararg transfers: WalletTransfer
-    ): Unit = coroutineScope {
-        val seqno = async { kotlin.runCatching { getSeqno() }.getOrNull() ?: 0 }
-        transfer(seqno.await(), *transfers)
     }
 
     private suspend fun transfer(
@@ -75,7 +51,7 @@ class WalletV4R2(
             stateInit = if (seqno == 0) createStateInit() else null,
             privateKey = privateKey,
             validUntil = Int.MAX_VALUE,
-            walletId = this.walletId,
+            walletId = this.subWalletId,
             seqno = seqno,
             transfers = transfers
         )
@@ -161,13 +137,13 @@ class WalletV4R2(
             createdLt = 0u,
             createdAt = 0u
         )
-        val init = Maybe.of(gift.stateInit?.let {
-            Either.of<StateInit, CellRef<StateInit>>(null, CellRef(it))
+        val init = Maybe.of(gift.messageData.stateInit?.let {
+            Either.of<StateInit, CellRef<StateInit>>(null, it)
         })
-        val body = if (gift.body == null) {
+        val body = if (gift.messageData.body.isEmpty()) {
             Either.of<Cell, CellRef<Cell>>(Cell.empty(), null)
         } else {
-            Either.of<Cell, CellRef<Cell>>(null, CellRef(gift.body!!))
+            Either.of<Cell, CellRef<Cell>>(null, CellRef(gift.messageData.body))
         }
 
         return MessageRelaxed(

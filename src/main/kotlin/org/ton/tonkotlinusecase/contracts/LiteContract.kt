@@ -24,7 +24,71 @@ import org.ton.tonkotlinusecase.toAddrString
  */
 open class LiteContract(
     override val liteClient: LiteClient
-): SmartContract(liteClient, 0) {
+): RootContract(liteClient) {
+
+    override val sourceCode: Cell
+        get() = TODO("Not yet implemented")
+
+    private suspend fun runSmcRetry(
+        address: AddrStd,
+        method: String,
+        lastBlockId: TonNodeBlockIdExt? = null,
+        params: List<VmStackValue> = listOf()
+    ): VmStack {
+        return if (lastBlockId != null && params.isNotEmpty())
+            liteClient.runSmcMethod(
+                address = LiteServerAccountId(address),
+                methodName = method,
+                blockId = lastBlockId,
+                params = params
+            )
+        else if (lastBlockId != null)
+            liteClient.runSmcMethod(address = LiteServerAccountId(address), methodName = method, blockId = lastBlockId)
+        else if (params.isNotEmpty())
+            liteClient.runSmcMethod(address = LiteServerAccountId(address), methodName = method, params = params)
+        else
+            liteClient.runSmcMethod(address = LiteServerAccountId(address), methodName = method)
+    }
+
+    // I do not use AOP or spring-retry because of current class-architecture
+    // we need to make retryable calls from other class that must be injected here
+    // but this class is the Root of all contracts, so it will not be very handful
+    // --
+    // also for make aspects work we need to make everything open: logger, liteClient etc
+    // probably liteClient must be removed from here somehow at all
+    suspend fun runSmc(
+        address: AddrStd,
+        method: String,
+        lastBlockId: TonNodeBlockIdExt? = null,
+        params: List<VmStackValue> = listOf()
+    ): VmStack? {
+        var result: VmStack? = null
+        var retryCount = 0
+        var ex: Exception? = null
+        while (result == null && retryCount < 4) {
+            if (retryCount > 0) {
+                delay(100)
+//                println("Retry $retryCount $method for ${address.toAddrString()}")
+            }
+            try {
+                result = runSmcRetry(address, method, lastBlockId, params)
+            } catch (e: Exception) {
+                ex = e
+            }
+            retryCount++
+        }
+        if (result == null && ex != null) {
+            logger.warn("Error in $method for ${address.toAddrString()}")
+            logger.warn(ex.message)
+        }
+//        }.onFailure {
+//            logger.warn("Error in $method for ${address.toAddrString()}")
+//            logger.warn(it.message)
+//        }.getOrNull()
+
+        return result
+    }
+
 
     suspend fun isContractDeployed(address: String): Boolean = isContractDeployed(AddrStd(address))
 
@@ -225,19 +289,6 @@ open class LiteContract(
             )
         }
     }
-
-    protected val logger = LoggerFactory.getLogger(this::class.simpleName)
-
-    override val address: MsgAddressInt
-        get() = TODO("Not yet implemented")
-    override val state: AccountState
-        get() = TODO("Not yet implemented")
-
-    override fun loadData(): Any? {
-        TODO("Not yet implemented")
-    }
-
-    override val CODE = Cell.empty()
 
     override fun createDataInit() = Cell.empty()
 
