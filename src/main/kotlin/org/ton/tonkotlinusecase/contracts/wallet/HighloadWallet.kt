@@ -24,6 +24,9 @@ import org.ton.tlb.storeTlb
 import org.ton.tonkotlinusecase.contracts.SmartContract
 import org.ton.tonkotlinusecase.toWalletTransfer
 import org.ton.tonkotlinusecase.utcLongNow
+import kotlin.math.pow
+import kotlin.math.roundToLong
+import kotlin.random.Random
 
 class HighloadWallet(
     val privateKey: PrivateKeyEd25519,
@@ -44,7 +47,8 @@ class HighloadWallet(
     }
 
     private fun generateQueryId(timeout: BigInt): BigInt {
-        return (BigInt.valueOf(utcLongNow()) + timeout).shiftLeft(32)
+        val random = BigInt.valueOf((Random.nextDouble() * 2.0.pow(30)).roundToLong())
+        return (BigInt.valueOf(utcLongNow()) + timeout).shiftLeft(32).or(random)
     }
 
     val wallet = HighLoadWalletV2Contract(
