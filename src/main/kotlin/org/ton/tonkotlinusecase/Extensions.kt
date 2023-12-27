@@ -4,6 +4,9 @@ import org.ton.bitstring.BitString
 import org.ton.block.*
 import org.ton.cell.CellBuilder
 import org.ton.cell.CellSlice
+import org.ton.contract.SnakeData
+import org.ton.contract.SnakeDataCons
+import org.ton.contract.SnakeDataTail
 import org.ton.contract.wallet.WalletTransfer
 import org.ton.crypto.Ed25519
 import org.ton.lite.api.liteserver.LiteServerAccountId
@@ -88,3 +91,25 @@ fun ipv4IntToStr(ip: Int): String {
 }
 
 fun utcTsNow() = Timestamp.valueOf(utcNow())
+
+
+fun ByteArray.toSnakeData(): SnakeData {
+    val chunks = this.asList().chunked(127)
+
+    if (chunks.isEmpty())
+        return SnakeDataTail(BitString.empty())
+
+    if (chunks.size == 1)
+        return SnakeDataTail(BitString.of(chunks[0].toByteArray()))
+
+    var nextSnakeData: SnakeData = SnakeDataTail(BitString.of(chunks.last().toByteArray()))
+
+    for (i in (0..chunks.size - 2).reversed()) {
+        val chunk = chunks[i]
+
+        val currSnakeData = SnakeDataCons(BitString.of(chunk.toByteArray()), nextSnakeData)
+        nextSnakeData = currSnakeData
+    }
+
+    return nextSnakeData
+}

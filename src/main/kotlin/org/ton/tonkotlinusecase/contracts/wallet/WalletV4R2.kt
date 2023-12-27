@@ -7,14 +7,18 @@ import org.ton.boc.BagOfCells
 import org.ton.cell.Cell
 import org.ton.cell.CellBuilder
 import org.ton.cell.buildCell
+import org.ton.contract.SnakeData
+import org.ton.contract.wallet.MessageData
 import org.ton.contract.wallet.WalletContract
 import org.ton.contract.wallet.WalletTransfer
 import org.ton.crypto.encoding.base64
 import org.ton.lite.client.LiteClient
 import org.ton.tlb.CellRef
 import org.ton.tlb.constructor.AnyTlbConstructor
-import org.ton.tlb.storeRef
+import org.ton.cell.storeRef
 import org.ton.tlb.storeTlb
+import org.ton.tonkotlinusecase.constants.SendMode
+import org.ton.tonkotlinusecase.toSnakeData
 import org.ton.tonkotlinusecase.toWalletTransfer
 
 
@@ -58,6 +62,25 @@ class WalletV4R2(
         sendExternalMessage(liteClient.liteApi, buildCell {
             storeTlb(Message.tlbCodec(AnyTlbConstructor), message)
         })
+    }
+
+    suspend fun transfer(address: String, amount: Long, comment: String) {
+        transfer(transfers = listOf(
+            WalletTransfer {
+                destination = AddrStd(address)
+                coins = Coins.ofNano(amount)
+                bounceable = false
+                sendMode = SendMode.PAY_GAS_SEPARATELY
+                messageData = MessageData.raw(
+                    body = buildCell {
+                        storeUInt(0, 32)
+                        storeRef {
+                            storeTlb(SnakeData, comment.toByteArray(Charsets.UTF_8).toSnakeData())
+                        }
+                    }
+                )
+            }
+        ).toTypedArray())
     }
 
 
